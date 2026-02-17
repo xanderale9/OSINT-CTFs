@@ -1,1 +1,38 @@
+📌 Description
 
+  We were provided with a social media dataset (social_media_scrape.jsonl).
+  The goal was to find the user_id of the person who commented the exact phrase:
+
+  "project horizon"
+
+  on posts from exactly 5 distinct authors.
+
+  🛠 Approach
+
+  1. Open the file line by line (JSON Lines format).
+
+  2. Filter comments that match the exact phrase.
+
+  3. Track the authors each commenter interacted with.
+
+  4. Identify the user who interacted with exactly 5 distinct authors
+
+✅ Script Used
+
+  import json
+  from collections import defaultdict
+
+  phrase = "project horizon"
+  authors_by_user = defaultdict(set)
+
+  with open("social_media_scrape.jsonl", "r", encoding="utf-8") as f:
+      for line in f:
+          data = json.loads(line)
+          if data.get("comment_text") == phrase:
+              user = data["user_id"]
+              author = data["post_author_id"]
+              authors_by_user[user].add(author)
+
+  for user, authors in authors_by_user.items():
+      if len(authors) == 5:
+          print("Target user_id:", user)
