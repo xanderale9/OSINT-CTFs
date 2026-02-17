@@ -1,1 +1,30 @@
+📌 Description
 
+  We were given 200,000 lines of firewall logs (firewall_logs.csv).
+  The objective was to detect a stealthy “low-and-slow” brute-force pattern:
+
+      14 failed login attempts
+      Immediately followed by 1 successful login
+      All within a 3.5-second window
+
+🛠 Approach
+
+  Load the CSV with pandas and convert the timestamp column to datetime.
+  Group entries by IP and sort by timestamp.
+  Search for sequences of 14 failures followed by 1 success within 3.5 seconds.
+
+✅ Script Used
+  import pandas as pd
+
+  df = pd.read_csv("firewall_logs.csv")
+  df["timestamp"] = pd.to_datetime(df["timestamp"])
+  df = df.sort_values(["ip_address", "timestamp"])
+
+  for ip, group in df.groupby("ip_address"):
+      events = group["status"].tolist()
+      times = group["timestamp"].tolist()
+      for i in range(len(events) - 14):
+          window = events[i:i+15]
+          if window.count("FAIL") == 14 and window[-1] == "SUCCESS":
+              if (times[i+14] - times[i]).total_seconds() <= 3.5:
+                  print("Suspicious IP:", ip)
