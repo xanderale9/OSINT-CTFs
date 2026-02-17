@@ -1,1 +1,56 @@
+📌 Description
 
+We received a GPS tracker dump (tracker_coordinates.csv) with over 15,000 pings, including spoofed points worldwide.
+The goal was to filter points within the UK mainland and visualize them to reveal a 5-letter word.
+
+🛠 Approach
+
+  Define an approximate UK mainland bounding box:
+
+      Latitude: 49.8 → 60.9
+      Longitude: -8.6 → 1.8
+      Filter points within the bounding box.
+      Plot the filtered points to reveal the hidden word.
+
+✅ Script Used
+
+import csv
+import folium
+
+# Archivo filtrado que ya tienes
+input_file = "gps_filtered_uk.csv"
+output_file = "uk_word_map_final.html"
+
+# Crear mapa centrado en Reino Unido
+m = folium.Map(location=[54.5, -3.0], zoom_start=6)
+
+points = []
+
+with open(input_file, newline='', encoding='utf-8') as f:
+    reader = csv.DictReader(f)
+    
+    # Si tu CSV tiene timestamps, los usamos para ordenar los puntos
+    if 'timestamp' in reader.fieldnames:
+        rows = sorted(reader, key=lambda r: r['timestamp'])
+    else:
+        rows = list(reader)
+    
+    # Añadir cada punto al mapa y a la lista de líneas
+    for row in rows:
+        lat = float(row['latitude'])
+        lon = float(row['longitude'])
+        points.append([lat, lon])
+        folium.CircleMarker(
+            location=[lat, lon],
+            radius=3,
+            color='red',
+            fill=True,
+            fill_opacity=0.7
+        ).add_to(m)
+
+# Conectar todos los puntos para ver la palabra
+folium.PolyLine(points, color="blue", weight=2).add_to(m)
+
+# Guardar mapa interactivo
+m.save(output_file)
+print(f"Mapa interactivo final generado: {output_file}")
