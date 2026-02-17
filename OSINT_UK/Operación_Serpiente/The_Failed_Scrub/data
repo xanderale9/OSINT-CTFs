@@ -1,1 +1,32 @@
+📌 Description
 
+  A ZIP file contained 500 images (challenge_images.zip).
+  The objective: find the image with un-scrubbed EXIF metadata and extract the 16-character Image Unique ID.
+
+🛠 Approach
+
+      Iterate through all images.
+      Check metadata using exiftool or Python.
+      Extract the Image Unique ID from the intact image.
+
+✅ Script Used
+
+import zipfile
+from PIL import Image, ExifTags
+
+zip_file = "subject_images.zip"
+
+with zipfile.ZipFile(zip_file, 'r') as z:
+    # Abrimos la imagen que tiene EXIF
+    filename = "subject_images/img_1191.jpg"
+    with z.open(filename) as f:
+        img = Image.open(f)
+        exif_data = img.getexif()
+        
+        if exif_data and len(exif_data) > 0:
+            print(f"Campos EXIF de {filename}:")
+            for tag_id, value in exif_data.items():
+                tag = ExifTags.TAGS.get(tag_id, tag_id)
+                print(f"{tag} ({tag_id}): {value}")
+        else:
+            print("No se encontró EXIF en la imagen")
