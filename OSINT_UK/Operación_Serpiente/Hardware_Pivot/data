@@ -1,1 +1,16 @@
+📌 Description
+
+  After extracting metadata, the Make and Model tags had been removed.
+  The task was to identify the camera make and model from other EXIF traces.
+
+🛠 Approach
+
+      Check hidden EXIF tags, lens info, serial numbers, and software signatures.
+
+    Recommended command:
+
+      exiftool target.jpg
+
+
+Then analyze output to deduce the camera make and model. I searched serial number on missing cameras site.
 
